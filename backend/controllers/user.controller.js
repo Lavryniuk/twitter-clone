@@ -164,7 +164,8 @@ export const updateUserProfile = async (req, res) => {
     // password should be null in response
     user.password = null;
 
-    return res.status(200).json(user);
+    const { password, ...safeUser } = user.toObject();
+    return res.status(200).json(safeUser);
   } catch (error) {
     console.log("Error in updateUser: ", error.message);
     res.status(500).json({ error: error.message });

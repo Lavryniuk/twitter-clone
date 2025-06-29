@@ -1,20 +1,55 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useEditProfile } from "../../hooks/useEditProfile";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
-const EditProfileModal = () => {
+const EditProfileModal = ({ authUser }) => {
   const [formData, setFormData] = useState({
     fullName: "",
     username: "",
     email: "",
     bio: "",
     link: "",
-    newPassword: "",
-    currentPassword: "",
   });
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+
+  const { updateProfile, isUpdatingProfile } = useEditProfile();
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "currentPassword") {
+      setCurrentPassword(value);
+    } else if (name === "newPassword") {
+      setNewPassword(value);
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
+  const onHandleSubmit = (e) => {
+    e.preventDefault();
+    updateProfile({
+      ...formData,
+      currentPassword,
+      newPassword,
+    });
+  };
+
+  useEffect(() => {
+    if (authUser) {
+      setFormData({
+        fullName: authUser.fullName,
+        username: authUser.username,
+        email: authUser.email,
+        bio: authUser.bio,
+        link: authUser.link,
+      });
+
+      setCurrentPassword("");
+      setNewPassword("");
+    }
+  }, [authUser]);
   return (
     <>
       <button
@@ -28,13 +63,7 @@ const EditProfileModal = () => {
       <dialog id="edit_profile_modal" className="modal">
         <div className="modal-box border rounded-md border-gray-700 shadow-md">
           <h3 className="font-bold text-lg my-3">Update Profile</h3>
-          <form
-            className="flex flex-col gap-4"
-            onSubmit={(e) => {
-              e.preventDefault();
-              alert("Profile updated successfully");
-            }}
-          >
+          <form className="flex flex-col gap-4" onSubmit={onHandleSubmit}>
             <div className="flex flex-wrap gap-2">
               <input
                 type="text"
@@ -75,17 +104,19 @@ const EditProfileModal = () => {
                 type="password"
                 placeholder="Current Password"
                 className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                value={formData.currentPassword}
+                value={currentPassword}
                 name="currentPassword"
                 onChange={handleInputChange}
+                autoComplete="new-password"
               />
               <input
                 type="password"
                 placeholder="New Password"
                 className="flex-1 input border border-gray-700 rounded p-2 input-md"
-                value={formData.newPassword}
+                value={newPassword}
                 name="newPassword"
                 onChange={handleInputChange}
+                autoComplete="new-password"
               />
             </div>
             <input
@@ -97,7 +128,7 @@ const EditProfileModal = () => {
               onChange={handleInputChange}
             />
             <button className="btn btn-primary rounded-full btn-sm text-white">
-              Update
+              {isUpdatingProfile ? <LoadingSpinner size="sm" /> : "Update"}
             </button>
           </form>
         </div>
