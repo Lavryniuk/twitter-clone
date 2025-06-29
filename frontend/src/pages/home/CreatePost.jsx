@@ -44,6 +44,11 @@ const CreatePost = () => {
       toast.success("Post created successfully");
       setText("");
       setImg(null);
+
+      if (imgRef.current) {
+        imgRef.current.value = null;
+      }
+
       queryClient.invalidateQueries({ queryKey: ["posts"] });
     },
   });

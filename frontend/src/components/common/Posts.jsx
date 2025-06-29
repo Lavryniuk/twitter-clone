@@ -49,8 +49,6 @@ const Posts = ({ feedType }) => {
       {(isLoading || isRefetching) && (
         <div className="flex flex-col justify-center">
           <PostSkeleton />
-          <PostSkeleton />
-          <PostSkeleton />
         </div>
       )}
       {(!isLoading || !isRefetching) && POSTS?.length === 0 && (
