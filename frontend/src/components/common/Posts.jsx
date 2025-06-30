@@ -3,7 +3,7 @@ import PostSkeleton from "../skeletons/PostSkeleton";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-const Posts = ({ feedType, username, userId }) => {
+const Posts = ({ feedType, username, userId, onPostsCount }) => {
   const getPostEndpoint = () => {
     switch (feedType) {
       case "forYou":
@@ -48,10 +48,18 @@ const Posts = ({ feedType, username, userId }) => {
     refetch();
   }, [feedType, refetch, username]);
 
+  useEffect(() => {
+    if (!isLoading && POSTS && typeof onPostsCount === "function") {
+      onPostsCount(POSTS.length);
+    }
+  }, [POSTS, isLoading, onPostsCount]);
+
   return (
     <>
       {(isLoading || isRefetching) && (
         <div className="flex flex-col justify-center">
+          <PostSkeleton />
+          <PostSkeleton />
           <PostSkeleton />
         </div>
       )}
